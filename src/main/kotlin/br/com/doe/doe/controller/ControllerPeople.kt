@@ -35,7 +35,7 @@ class ControllerPeople(private val service: ServicePeople) {
     }
 
     @PostMapping
-    fun setPeople(@RequestBody people: NewPeopleForm, uriBuilder: UriComponentsBuilder ): ResponseEntity<PeopleView>{
+    fun setPeople(@RequestBody @Valid people: NewPeopleForm, uriBuilder: UriComponentsBuilder ): ResponseEntity<PeopleView>{
         val peopleView = service.setPeople(people)
         val uri = uriBuilder.path("/people/${peopleView.id}").build().toUri()
         return ResponseEntity.created(uri).body(peopleView)

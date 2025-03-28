@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 class PeopleViewMapper: Mapper<People, PeopleView> {
     override fun map(p: People): PeopleView {
         return PeopleView(
-            p.id, p.document, p.name
+            p.id, p.name, p.document
         )
     }
 }
