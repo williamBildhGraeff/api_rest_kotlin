@@ -3,9 +3,11 @@ package br.com.doe.doe.service
 import br.com.doe.doe.dto.AtualizacaoPeopleForm
 import br.com.doe.doe.dto.NewPeopleForm
 import br.com.doe.doe.dto.PeopleView
+import br.com.doe.doe.exception.NotFoundException
 import br.com.doe.doe.mapper.PeopleFormMapper
 import br.com.doe.doe.mapper.PeopleViewMapper
 import br.com.doe.doe.model.People
+import jakarta.validation.Valid
 import org.springframework.stereotype.Service
 
 @Service
@@ -13,7 +15,8 @@ import org.springframework.stereotype.Service
 class ServicePeople(
     private var peoples: List<People> = ArrayList(),
     private var peopleFormMapper: PeopleFormMapper,
-    private var peopleViewMapper: PeopleViewMapper
+    private var peopleViewMapper: PeopleViewMapper,
+    private val notFoundMessage: String = "Pessoa não encontrada!"
 ) {
 
     fun list(): List<People> {
@@ -21,12 +24,12 @@ class ServicePeople(
     }
 
     fun getById(id: Long): People {
-        return peoples.stream().filter({
-            p -> p.id == id
-        }).findFirst().get()
+        return peoples.stream().filter { p ->
+            p.id == id
+        }.findFirst().orElseThrow{NotFoundException(notFoundMessage)}
     }
 
-    fun setPeople(people: NewPeopleForm): PeopleView{
+    fun setPeople(@Valid people: NewPeopleForm): PeopleView{
         val newPeople = peopleFormMapper.map(people)
         newPeople.id = peoples.size.toLong() + 1
         peoples = peoples + newPeople
