@@ -5,6 +5,7 @@ import br.com.doe.doe.dto.NewPeopleForm
 import br.com.doe.doe.dto.PeopleView
 import br.com.doe.doe.model.People
 import br.com.doe.doe.service.ServicePeople
+import jakarta.transaction.Transactional
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,7 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder
 class ControllerPeople(private val service: ServicePeople) {
 
     @GetMapping
-    fun list(): List<People>{
+    fun list(): List<PeopleView>{
         return service.list()
     }
 
@@ -35,6 +36,7 @@ class ControllerPeople(private val service: ServicePeople) {
     }
 
     @PostMapping
+    @Transactional
     fun setPeople(@RequestBody @Valid people: NewPeopleForm, uriBuilder: UriComponentsBuilder ): ResponseEntity<PeopleView>{
         val peopleView = service.setPeople(people)
         val uri = uriBuilder.path("/people/${peopleView.id}").build().toUri()
@@ -42,6 +44,7 @@ class ControllerPeople(private val service: ServicePeople) {
     }
 
     @PutMapping
+    @Transactional
     fun update(@RequestBody @Valid people: AtualizacaoPeopleForm): ResponseEntity<PeopleView>{
         val peopleView = service.update(people)
         return ResponseEntity.ok(peopleView)
@@ -49,6 +52,7 @@ class ControllerPeople(private val service: ServicePeople) {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     fun delete(@PathVariable id: Long){
         service.delete(id)
     }

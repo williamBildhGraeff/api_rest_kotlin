@@ -3,6 +3,7 @@ package br.com.doe.doe.controller
 import br.com.doe.doe.dto.NewUserForm
 import br.com.doe.doe.dto.UserView
 import br.com.doe.doe.service.ServiceAuth
+import jakarta.transaction.Transactional
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -26,6 +27,7 @@ class ControllerAuth(private val service: ServiceAuth) {
     }
 
     @PostMapping
+    @Transactional
     fun setUser(@RequestBody @Valid dto: NewUserForm) {
         service.setUser(dto)
     }

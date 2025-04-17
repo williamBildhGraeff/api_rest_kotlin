@@ -7,50 +7,45 @@ import br.com.doe.doe.exception.NotFoundException
 import br.com.doe.doe.mapper.PeopleFormMapper
 import br.com.doe.doe.mapper.PeopleViewMapper
 import br.com.doe.doe.model.People
+import br.com.doe.doe.repository.PeopleRepository
 import jakarta.validation.Valid
+import org.hibernate.annotations.NotFound
 import org.springframework.stereotype.Service
+import java.util.stream.Collectors
 
 @Service
 
 class ServicePeople(
-    private var peoples: List<People> = ArrayList(),
+    private val repository: PeopleRepository,
     private var peopleFormMapper: PeopleFormMapper,
     private var peopleViewMapper: PeopleViewMapper,
     private val notFoundMessage: String = "Pessoa não encontrada!"
 ) {
 
-    fun list(): List<People> {
-        return peoples
+    fun list(): List<PeopleView> {
+        return repository.findAll().stream().map{ p -> peopleViewMapper.map(p)}.collect(Collectors.toList())
     }
 
     fun getById(id: Long): People {
-        return peoples.stream().filter { p ->
-            p.id == id
-        }.findFirst().orElseThrow{NotFoundException(notFoundMessage)}
+        return repository.getOne(id)
     }
 
     fun setPeople(@Valid people: NewPeopleForm): PeopleView{
         val newPeople = peopleFormMapper.map(people)
-        newPeople.id = peoples.size.toLong() + 1
-        peoples = peoples + newPeople
+        repository.save(newPeople)
         return peopleViewMapper.map(newPeople)
     }
 
     fun update(form: AtualizacaoPeopleForm): PeopleView{
-        val oldPeople = this.getById(form.id)
+        val people = repository.findById(form.id).orElseThrow { NotFoundException(notFoundMessage) }
+        people.name = form.name
+        people.document = form.document
 
-        peoples = peoples.minus(oldPeople).plus(People(
-            id = form.id,
-            name = form.name,
-            document = form.document
-        ))
-        val updatePeople = this.getById(form.id)
-        return peopleViewMapper.map(updatePeople)
+        return peopleViewMapper.map(people)
     }
 
     fun delete(id: Long) {
-        val deletePeople = this.getById(id)
-        peoples = peoples.minus(deletePeople)
+       repository.deleteById(id)
     }
 
 
