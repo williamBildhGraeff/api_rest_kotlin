@@ -14,6 +14,7 @@ class PeopleFormMapper(): Mapper<NewPeopleForm, People> {
             id = u.id,
             name = u.name,
             document = u.document,
+            birth_date = u.birth_date,
         )
     }
 
